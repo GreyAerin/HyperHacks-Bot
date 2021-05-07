@@ -4,8 +4,6 @@ const request = require('request');
 const Database = require("@replit/database")
 const db = new Database()
 
-const reqURL = "https://api.typeform.com/forms/jPM6EAMU/responses?page_size=300&fields=FZ4erq9XxV1X";
-const emailReqURL = "https://api.typeform.com/forms/jPM6EAMU/responses?page_size=300&fields=tsvFVc9ELgp3";
 const client = new Discord.Client();
 
 class bot{
@@ -35,7 +33,7 @@ class bot{
   handleVerification(user, discrim, member){
     console.log(`${user}#${discrim}`)
     const options = {
-      url: reqURL,
+      url: process.env.REQ_URL,
       headers: {
         'Authorization': process.env.TYPEFORM_TOKEN
       }
@@ -61,7 +59,7 @@ class bot{
   handleNewVerification(email, member, msg){
     console.log(email);
     const options = {
-      url: emailReqURL,
+      url: EMAIL_URL,
       headers: {
         'Authorization': process.env.TYPEFORM_TOKEN
       }

@@ -6,23 +6,30 @@ const db = new Database()
 
 const client = new Discord.Client();
 
-class bot{
+class bot
+{
   constructor(){
     this.resp = {};
   }
   intialize(){
     client.on("message", msg =>{
-      if(msg.content === `${process.env.PREFIX}verify`){
+      if(msg.content === `${process.env.PREFIX}verify`)
+      {
         let x = msg.member;
         this.handleVerification(msg.author.username, msg.author.discriminator, x);
       }
-      if(msg.content.length > 7){
-        if(msg.content.startsWith(`${process.env.PREFIX}verify`)){
+      if(msg.content.length > 7)
+      {
+        if(msg.content.startsWith(`${process.env.PREFIX}verify`))
+        {
           let info = msg.content.split(" ");
-          if(info.length < 1){
+          if(info.length < 1)
+          {
             msg.channel.send("Not enough info, try again.");
             return;
-          }else{
+          }
+          else
+          {
             this.handleNewVerification(info[1], msg.member, msg);
           }
         }
@@ -30,7 +37,8 @@ class bot{
     });
   }
 
-  handleVerification(user, discrim, member){
+  handleVerification(user, discrim, member)
+  {
     console.log(`${user}#${discrim}`)
     const options = {
       url: process.env.REQ_URL,
@@ -46,8 +54,10 @@ class bot{
       let x = "";
       let parsed = JSON.parse(body);
       this.resp = parsed;
-      for (let i = 0; i < this.resp.items.length; i++){
-        if(this.resp.items[i].answers[0].text === `${user}#${discrim}`){
+      for (let i = 0; i < this.resp.items.length; i++)
+      {
+        if(this.resp.items[i].answers[0].text === `${user}#${discrim}`)
+        {
           member.roles.add(['831174606991654973']);
           client.channels.cache.get('831388721534205952').send(`Member added: ${user}#${discrim}`);
           db.set(`${user}#${discrim}`, "Verified");
@@ -56,7 +66,8 @@ class bot{
       }
     });
   }
-  handleNewVerification(email, member, msg){
+  handleNewVerification(email, member, msg)
+  {
     console.log(email);
     const options = {
       url: EMAIL_URL,
@@ -72,8 +83,10 @@ class bot{
       let x = "";
       let parsed = JSON.parse(body);
       this.resp = parsed;
-      for (let i = 0; i < this.resp.items.length; i++){
-        if(this.resp.items[i].answers[0].email === `${email}`){
+      for (let i = 0; i < this.resp.items.length; i++)
+      {
+        if(this.resp.items[i].answers[0].email === `${email}`)
+        {
           member.roles.add(['831174606991654973']);
           client.channels.cache.get('831388721534205952').send(`Member added: ${msg.author.username}#${msg.author.discriminator} through email: ${email}`);
           db.set(`${msg.author.username}#${msg.author.discriminator}`, "Verified");
@@ -85,26 +98,36 @@ class bot{
 }
 let Bot = new bot();
 client.on('ready', ()=>{
+
   console.log(`${new Date().toLocaleString()}: Logged in as ${client.user.tag}`);
   client.channels.cache.get(process.env.DISCORD_LOG).send(`${new Date().toLocaleString()}: Logged in as ${client.user.tag}`);
   Bot.intialize();
   client.user.setPresence({activity: {name: "Don't touch my code"}, status: "online"})
+
 });
 client.on('message', msg =>{
-  if(msg.content === `${process.env.PREFIX}amIVerified`){
+  if(msg.content === `${process.env.PREFIX}amIVerified`)
+  {
     db.list().then(keys =>{
+
       client.channels.cache.get('831388721534205952').send(`Checking verification for: ${msg.author.username}#${msg.author.discriminator}`);
-      if(keys.includes(`${msg.author.username}#${msg.author.discriminator}`)){
+
+      if(keys.includes(`${msg.author.username}#${msg.author.discriminator}`))
+      {
         msg.channel.send("You are verified!");
         client.channels.cache.get('831388721534205952').send(`${msg.author.username}#${msg.author.discriminator} is verified`);
-      }else{
+      }
+      else
+      {
         msg.channel.send("You are not verified, please do !verify. If this does not work, make sure you put the correct discord username in our form.")
         client.channels.cache.get('831388721534205952').send(`${msg.author.username}#${msg.author.discriminator} is not verified`);
       }
     })
   }
-  if(msg.content.startsWith(`${process.env.PREFIX}.createTeam`)){
-    if(msg.content.split(" ")[1] === undefined){
+  if(msg.content.startsWith(`${process.env.PREFIX}.createTeam`))
+  {
+    if(msg.content.split(" ")[1] === undefined)
+    {
       msg.channel.send("Please format the command in the following format: !createTeam {TeamName}")
     }
     let teamName = msg.content.split(" ")[1];

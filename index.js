@@ -40,22 +40,28 @@ class bot
   handleVerification(user, discrim, member)
   {
     console.log(`${user}#${discrim}`)
+
     const options = {
       url: process.env.REQ_URL,
       headers: {
         'Authorization': process.env.TYPEFORM_TOKEN
       }
     };
+
     request.get(options, (err, res, body) => {
+
       if (err) {
         console.log('request error: ', err);
         return;
       }
+
       let x = "";
       let parsed = JSON.parse(body);
       this.resp = parsed;
+
       for (let i = 0; i < this.resp.items.length; i++)
       {
+
         if(this.resp.items[i].answers[0].text === `${user}#${discrim}`)
         {
           member.roles.add(['831174606991654973']);
@@ -63,6 +69,7 @@ class bot
           db.set(`${user}#${discrim}`, "Verified");
           break;
         }
+
       }
     });
   }
@@ -102,12 +109,25 @@ client.on('ready', ()=>{
   console.log(`${new Date().toLocaleString()}: Logged in as ${client.user.tag}`);
   client.channels.cache.get(process.env.DISCORD_LOG).send(`${new Date().toLocaleString()}: Logged in as ${client.user.tag}`);
   Bot.intialize();
-  client.user.setPresence({activity: {name: "Don't touch my code"}, status: "online"})
+  client.user.setPresence({activity: {name: "Credits to Alternis and Yoshi for the bot"}, status: "online"})
 
 });
 client.on('message', msg =>{
   if(msg.content === `${process.env.PREFIX}amIVerified`)
   {
+    isVerified(msg)
+  }
+  if(msg.content.startsWith(`${process.env.PREFIX}team`))
+  {
+    if(msg.content.split(" ")[1] === undefined || msg.content.split(" ")[2] == undefined)
+    {
+      msg.channel.send("Please format the command in the following format: !team {option} {perameters}")
+    }
+    teamCommands(msg);
+  }
+})
+
+function isVerified(msg){
     db.list().then(keys =>{
 
       client.channels.cache.get('831388721534205952').send(`Checking verification for: ${msg.author.username}#${msg.author.discriminator}`);
@@ -123,15 +143,55 @@ client.on('message', msg =>{
         client.channels.cache.get('831388721534205952').send(`${msg.author.username}#${msg.author.discriminator} is not verified`);
       }
     })
-  }
-  if(msg.content.startsWith(`${process.env.PREFIX}.createTeam`))
-  {
-    if(msg.content.split(" ")[1] === undefined)
+}
+function teamCommands(msg)
+{
+
+  let command = msg.content.split(" ")[1].toLowerCase();
+  let perameters = msg.content.split(" ")[2].toLowerCase();
+  if (command === "create"){
+    msg.guild.roles.create({
+      data:{
+        name: `${perameters}`,
+        color: `GREY`
+      }
+    })
+    let teamRole = msg.guild.roles.cache.find(role => role.name =`${perameters}`)
+    msg.member.roles.add([`${teamRole}`])
+    msg.guild.channels.create(`${perameters}`,
     {
-      msg.channel.send("Please format the command in the following format: !createTeam {TeamName}")
-    }
-    let teamName = msg.content.split(" ")[1];
-    
+      type: 'text',
+      permissionOverwrites: 
+      [
+        {
+          id: teamRole,
+          allow:['VIEW_CHANNEL', 'SEND_MESSAGES'],
+        },
+        {
+          id: '830650015550668820',
+          deny:['VIEW_CHANNEL'],
+        }
+      ],
+    }).then(channel => {
+      channel.setParent("840328150319628319")
+    })
+    return
   }
-})
+  else if (command === "add"){
+   
+    return
+  }
+
+  else if (command === "remove"){
+
+    return
+  }
+
+  else if (command === "delete"){
+
+    return
+  }
+
+
+}
 client.login(process.env.TOKEN)

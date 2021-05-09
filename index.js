@@ -55,7 +55,6 @@ class bot
         return;
       }
 
-      let x = "";
       let parsed = JSON.parse(body);
       this.resp = parsed;
 
@@ -87,7 +86,6 @@ class bot
         console.log('request error: ', err);
         return;
       }
-      let x = "";
       let parsed = JSON.parse(body);
       this.resp = parsed;
       for (let i = 0; i < this.resp.items.length; i++)
